@@ -6,6 +6,7 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
+import { User } from './user.entity';
 
 @Entity('companies')
 export class Company {
@@ -33,4 +34,7 @@ export class Company {
 
   @OneToMany(() => Company, (company) => company.parent)
   children: Company[];
+
+  @ManyToOne(() => User, (user) => user.companies)
+  user: User;
 }

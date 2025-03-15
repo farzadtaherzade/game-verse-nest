@@ -9,6 +9,7 @@ import {
 import { Game } from './game.entity';
 import { Rate } from './rate.entity';
 import { Review } from './review.entity';
+import { Company } from './company.entity';
 
 @Entity('users')
 export class User {
@@ -42,4 +43,7 @@ export class User {
 
   @OneToMany(() => Review, (review) => review.platform)
   reviews: Review[];
+
+  @OneToMany(() => Company, (company) => company.user)
+  companies: Company[];
 }
