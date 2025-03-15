@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('genres')
 export class Genre {
@@ -6,5 +6,6 @@ export class Genre {
   id: number;
 
   @Column({ nullable: false, unique: true })
+  @Index({})
   name: string;
 }
