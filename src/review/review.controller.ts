@@ -31,9 +31,20 @@ export class ReviewController {
     return this.reviewService.findAll(gameId);
   }
 
+  @Get('my-reviews')
+  @UseGuards(JwtAuthGuard)
+  findMyReviews(@GetUser() user: User) {
+    return this.reviewService.findMyReviews(user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.reviewService.findOne(+id);
+  }
+
+  @Get('user/:id')
+  findUserReviews(@Param('id') id: string) {
+    return this.reviewService.findUserReviews(+id);
   }
 
   @Patch(':id')

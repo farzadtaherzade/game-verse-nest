@@ -69,6 +69,38 @@ export class ReviewService {
     return reviews;
   }
 
+  async findMyReviews(user: User) {
+    return await this.reviewRepository.find({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+      relations: {
+        user: true,
+        platform: true,
+        game: true,
+        rate: true,
+      },
+    });
+  }
+
+  async findUserReviews(id: number) {
+    return await this.reviewRepository.find({
+      where: {
+        user: {
+          id,
+        },
+      },
+      relations: {
+        user: true,
+        platform: true,
+        game: true,
+        rate: true,
+      },
+    });
+  }
+
   async findOne(id: number) {
     const review = await this.reviewRepository.findOne({
       where: {
