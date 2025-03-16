@@ -1,3 +1,4 @@
+import { FileService } from './../utils/file.service';
 import {
   Injectable,
   NotFoundException,
@@ -13,6 +14,7 @@ import { User } from '../entities/user.entity';
 import { Game } from '../entities/game.entity';
 import { GenresService } from '../genres/genres.service';
 import { Platform } from 'src/entities/platform.entity';
+import { Company } from 'src/entities/company.entity';
 
 @Injectable()
 export class GamesService {
@@ -22,6 +24,9 @@ export class GamesService {
     @InjectRepository(Platform)
     private readonly platformRepository: Repository<Platform>,
     private readonly genreService: GenresService,
+    @InjectRepository(Company)
+    private readonly companyRepository: Repository<Company>,
+    private readonly fileService: FileService,
   ) {}
 
   async create(
@@ -51,10 +56,18 @@ export class GamesService {
     if (existingGame) {
       throw new BadRequestException('A game with this slug already exists');
     }
+
+    const company = await this.companyRepository.findOne({
+      where: {
+        id: createGameDto.companyId,
+      },
+    });
+
+    if (!company) throw new BadRequestException('Company not found');
+
     const genres = await this.genreService.findOrCreate(genresIds);
     cover = file.filename;
 
-    console.log(user);
     const game = this.gameRepository.create({
       cover,
       description,
@@ -65,6 +78,7 @@ export class GamesService {
       genres,
       release_date,
       platforms: [],
+      company,
     });
 
     for (const id of platforms) {
@@ -137,14 +151,15 @@ export class GamesService {
     return await this.gameRepository.save(updatedGame);
   }
 
-  async remove(id: number, user: User): Promise<void> {
+  async remove(id: number, user: User): Promise<{ message: string }> {
     const game = await this.findOne(id);
-    console.log(user);
+    this.fileService.deleteFile(game.cover, 'games');
     if (game.user.id != user.id)
       throw new UnauthorizedException(
         `You not Allowd delete game ${game.title} -- ${game.id}`,
       );
     await this.gameRepository.remove(game);
+    return { message: 'Game deleted successfully' };
   }
 
   private async generateUniqueSlug(title: string): Promise<string> {

@@ -4,7 +4,7 @@ import { UpdateCompanyDto } from './dto/update-company.dto';
 import { User } from 'src/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'src/entities/company.entity';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 
 @Injectable()
 export class CompanyService {
@@ -68,5 +68,13 @@ export class CompanyService {
   async remove(id: number) {
     const company = await this.findOne(id);
     return await this.companyRepository.remove(company);
+  }
+
+  async search(name: string) {
+    return await this.companyRepository.find({
+      where: {
+        name: Like(`%${name}%`),
+      },
+    });
   }
 }

@@ -5,9 +5,15 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Game } from '../entities/game.entity';
 import { GenresModule } from 'src/genres/genres.module';
 import { Platform } from 'src/entities/platform.entity';
+import { Company } from 'src/entities/company.entity';
+import { UtilsModule } from 'src/utils/utils.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Game, Platform]), GenresModule],
+  imports: [
+    TypeOrmModule.forFeature([Game, Platform, Company]),
+    GenresModule,
+    UtilsModule,
+  ],
   controllers: [GamesController],
   providers: [GamesService],
   exports: [GamesService],

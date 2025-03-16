@@ -7,6 +7,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { Game } from './game.entity';
 
 @Entity('companies')
 export class Company {
@@ -37,4 +38,7 @@ export class Company {
 
   @ManyToOne(() => User, (user) => user.companies)
   user: User;
+
+  @OneToMany(() => Game, (game) => game.company)
+  games: Game[];
 }

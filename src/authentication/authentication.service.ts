@@ -47,9 +47,10 @@ export class AuthenticationService {
   }
 
   async signup(dto: SignupDto) {
-    console.log(dto);
     await this.userService.create({ ...dto });
-    return 'user created successfully';
+    return {
+      message: 'user created successfully',
+    };
   }
 
   async refresh(

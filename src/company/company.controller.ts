@@ -46,4 +46,15 @@ export class CompanyController {
   remove(@Param('id') id: string) {
     return this.companyService.remove(+id);
   }
+
+  @Get('/search/:name')
+  search(@Param('name') name: string) {
+    return this.companyService.search(name);
+  }
+
+  @Get('/my-companies')
+  @UseGuards(JwtAuthGuard)
+  findMyCompanies(@GetUser() user: User) {
+    return this.companyService.findMyCompanies(user);
+  }
 }

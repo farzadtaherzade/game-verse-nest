@@ -14,6 +14,7 @@ import { Genre } from './genre.entity';
 import { Platform } from './platform.entity';
 import { Rate } from './rate.entity';
 import { Review } from './review.entity';
+import { Company } from './company.entity';
 
 @Entity('games')
 export class Game {
@@ -54,6 +55,9 @@ export class Game {
 
   @OneToMany(() => Review, (review) => review.game)
   reviews: Review[];
+
+  @ManyToOne(() => Company, (company) => company.games)
+  company: Company;
 
   @CreateDateColumn()
   created_at: Date;

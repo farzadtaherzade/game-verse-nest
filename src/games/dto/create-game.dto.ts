@@ -3,6 +3,7 @@ import {
   ArrayMinSize,
   IsArray,
   IsNotEmpty,
+  IsNumber,
   IsOptional,
   IsString,
 } from 'class-validator';
@@ -35,4 +36,9 @@ export class CreateGameDto {
   @ArrayMinSize(1)
   @Type(() => Number)
   platforms: number[];
+
+  @IsNotEmpty()
+  @IsNumber()
+  @Type(() => Number)
+  companyId: number;
 }
