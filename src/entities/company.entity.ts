@@ -17,9 +17,6 @@ export class Company {
   @Column({ nullable: false })
   name: string;
 
-  @Column({ nullable: true })
-  logo: string;
-
   @Column({ length: 250, nullable: true })
   about: string;
 

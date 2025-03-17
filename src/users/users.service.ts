@@ -28,7 +28,25 @@ export class UsersService {
       },
     });
 
-    console.log(user);
+    return user ?? undefined;
+  }
+
+  async findOneByEmail(email: string): Promise<User | undefined> {
+    const user = await this.userRepository.findOne({
+      where: {
+        email,
+      },
+      select: {
+        password: true,
+        avatar: true,
+        created_at: true,
+        email: true,
+        games: true,
+        id: true,
+        username: true,
+      },
+    });
+
     return user ?? undefined;
   }
 

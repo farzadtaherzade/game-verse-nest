@@ -1,4 +1,4 @@
-import { FileService } from './../utils/file.service';
+import { FileService } from '../common/utils/file.service';
 import {
   Injectable,
   NotFoundException,

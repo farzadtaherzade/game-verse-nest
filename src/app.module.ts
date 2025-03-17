@@ -8,6 +8,8 @@ import { GenresModule } from './genres/genres.module';
 import { PlatformModule } from './platform/platform.module';
 import { ReviewModule } from './review/review.module';
 import { CompanyModule } from './company/company.module';
+import { MailModule } from './mail/mail.module';
+import { QueuesModule } from './queues/queues.module';
 
 @Module({
   imports: [
@@ -34,6 +36,8 @@ import { CompanyModule } from './company/company.module';
     PlatformModule,
     ReviewModule,
     CompanyModule,
+    MailModule,
+    QueuesModule,
   ],
 })
 export class AppModule {}

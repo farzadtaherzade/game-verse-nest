@@ -9,8 +9,10 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './token-payload.interface';
 import { SignupDto } from './dto/signup.dto';
 import { ConfigService } from '@nestjs/config';
-import { RedisService } from 'src/services/redis.service';
+import { RedisService } from 'src/common/services/redis.service';
 import { PasswordService } from 'src/users/password/password.service';
+import { InjectQueue } from '@nestjs/bullmq';
+import { Queue } from 'bullmq';
 
 @Injectable()
 export class AuthenticationService {
@@ -22,6 +24,7 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
     private readonly redisService: RedisService,
     private readonly passwordService: PasswordService,
+    @InjectQueue('SEND_WELCOME') private readonly emailQueue: Queue,
   ) {}
 
   async signin(
@@ -38,7 +41,11 @@ export class AuthenticationService {
       throw new BadRequestException('Username or Password not valid!');
     const payload: TokenPayload = { userId: user.id };
     const { access_token, refresh_token } = this.generateToken(payload);
-    console.log(payload);
+
+    await this.emailQueue.add('SEND_EMAIL', {
+      email: user.email,
+      username: user.username,
+    });
 
     return {
       access_token,
@@ -89,7 +96,6 @@ export class AuthenticationService {
       expiresIn: '14d',
       secret: this.configService.get('JWT_REFRESH_SECRET'),
     });
-    console.log(payload);
 
     return {
       access_token,

@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -15,6 +16,9 @@ export class Rate {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({ type: 'float', default: 0 })
+  score: number;
+
   @OneToOne(() => Review, (review) => review.rate, { onDelete: 'CASCADE' })
   @JoinColumn()
   review: Review;
@@ -25,6 +29,6 @@ export class Rate {
   @ManyToOne(() => User, (user) => user.rates)
   user: User;
 
-  @Column()
-  score: number;
+  @CreateDateColumn()
+  created_at: Date;
 }
