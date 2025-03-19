@@ -1,7 +1,7 @@
 import { MailerService } from '@nestjs-modules/mailer';
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { SendWelcome } from 'src/common/interfaces/send-welcome.interface';
+import { SendWelcome } from 'src/shared/interfaces/send-welcome.interface';
 
 @Injectable()
 export class MailService {

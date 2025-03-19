@@ -15,6 +15,7 @@ import {
   ApiResponse,
   ApiParam,
   ApiBearerAuth,
+  ApiBody,
 } from '@nestjs/swagger';
 import { CreateGenreDto } from './dto/create-genre.dto';
 
@@ -27,6 +28,10 @@ export class GenresController {
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
   @ApiOperation({ summary: 'Create a new genre' })
+  @ApiBody({
+    description: 'Create a new genre',
+    type: CreateGenreDto,
+  })
   @ApiResponse({
     status: 201,
     description: 'The genre has been successfully created.',

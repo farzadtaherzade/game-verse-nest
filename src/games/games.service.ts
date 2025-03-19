@@ -1,4 +1,4 @@
-import { FileService } from '../common/utils/file.service';
+import { FileService } from '../shared/utils/file.service';
 import {
   Injectable,
   NotFoundException,
@@ -15,6 +15,7 @@ import { Game } from '../entities/game.entity';
 import { GenresService } from '../genres/genres.service';
 import { Platform } from 'src/entities/platform.entity';
 import { Company } from 'src/entities/company.entity';
+import { PaginationDto } from 'src/shared/dto/pagination.dto';
 
 @Injectable()
 export class GamesService {
@@ -95,14 +96,26 @@ export class GamesService {
     return await this.gameRepository.save(game);
   }
 
-  async findAll(): Promise<Game[]> {
-    return await this.gameRepository.find({
+  async findAll(paginate: PaginationDto) {
+    const { limit = 10, page = 1 } = paginate;
+    const [games, count] = await this.gameRepository.findAndCount({
       relations: {
         genres: true,
         user: true,
         platforms: true,
       },
+      take: limit,
+      skip: limit * (page - 1),
     });
+
+    return {
+      data: games,
+      meta: {
+        totalItems: count,
+        limit,
+        page,
+      },
+    };
   }
 
   async findOne(id: number): Promise<Game> {

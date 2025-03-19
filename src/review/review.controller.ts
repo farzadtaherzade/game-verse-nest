@@ -13,7 +13,7 @@ import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
-import { GetUser } from 'src/common/decorators/user.decorator';
+import { GetUser } from 'src/shared/decorators/user.decorator';
 import { User } from 'src/entities/user.entity';
 import {
   ApiTags,

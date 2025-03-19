@@ -12,7 +12,7 @@ import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
 import { UpdateCompanyDto } from './dto/update-company.dto';
 import { JwtAuthGuard } from 'src/authentication/guards/jwt-auth.guard';
-import { GetUser } from 'src/common/decorators/user.decorator';
+import { GetUser } from 'src/shared/decorators/user.decorator';
 import { User } from 'src/entities/user.entity';
 import {
   ApiBearerAuth,

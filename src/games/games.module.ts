@@ -6,7 +6,7 @@ import { Game } from '../entities/game.entity';
 import { GenresModule } from 'src/genres/genres.module';
 import { Platform } from 'src/entities/platform.entity';
 import { Company } from 'src/entities/company.entity';
-import { UtilsModule } from 'src/common/utils/utils.module';
+import { UtilsModule } from 'src/shared/utils/utils.module';
 
 @Module({
   imports: [

@@ -9,7 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { TokenPayload } from './token-payload.interface';
 import { SignupDto } from './dto/signup.dto';
 import { ConfigService } from '@nestjs/config';
-import { RedisService } from 'src/common/services/redis.service';
+import { RedisService } from 'src/shared/services/redis.service';
 import { PasswordService } from 'src/users/password/password.service';
 import { InjectQueue } from '@nestjs/bullmq';
 import { Queue } from 'bullmq';

@@ -1,7 +1,7 @@
 import { Processor, WorkerHost } from '@nestjs/bullmq';
 import { Job } from 'bullmq';
 import { MailService } from 'src/mail/mail.service';
-import { type SendWelcome } from 'src/common/interfaces/send-welcome.interface';
+import { type SendWelcome } from 'src/shared/interfaces/send-welcome.interface';
 
 @Processor('SEND_WELCOME')
 export class SendWelcomeConsumer extends WorkerHost {

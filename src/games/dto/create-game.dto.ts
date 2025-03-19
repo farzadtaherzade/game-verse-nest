@@ -1,5 +1,4 @@
-import { UploadCoverGameDto } from './upload-cover-game.dto';
-import { ApiProperty, IntersectionType } from '@nestjs/swagger';
+import { ApiProperty } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import {
   ArrayMinSize,
@@ -8,7 +7,7 @@ import {
   IsNumber,
   IsOptional,
 } from 'class-validator';
-export class CreateGameDto extends IntersectionType(UploadCoverGameDto) {
+export class CreateGameDto {
   @IsNotEmpty()
   @ApiProperty()
   title: string;
@@ -22,13 +21,11 @@ export class CreateGameDto extends IntersectionType(UploadCoverGameDto) {
   score: number;
 
   @IsOptional()
-  @ApiProperty()
-  slug: string;
+  @ApiProperty({ required: false })
+  slug?: string;
 
   @IsArray()
-  @ArrayMinSize(1)
   @Transform(({ value }): string[] => {
-    // Handle both string and array inputs for genres
     if (typeof value === 'string') {
       return value.split(',').map((item) => item.trim());
     }
@@ -36,8 +33,7 @@ export class CreateGameDto extends IntersectionType(UploadCoverGameDto) {
   })
   @ApiProperty({
     type: [String],
-    description: 'Array of genre names (comma-separated string or array)',
-    example: 'RPG,Adventure',
+    examples: ['RPG', 'Adventure'],
   })
   genres: string[];
 
@@ -50,7 +46,6 @@ export class CreateGameDto extends IntersectionType(UploadCoverGameDto) {
   @IsArray()
   @ArrayMinSize(1)
   @Transform(({ value }): number[] => {
-    // Handle string input for platform IDs
     if (typeof value === 'string') {
       return value.split(',').map((item) => Number(item.trim()));
     }
@@ -58,8 +53,6 @@ export class CreateGameDto extends IntersectionType(UploadCoverGameDto) {
   })
   @ApiProperty({
     type: [Number],
-    description: 'Array of platform IDs (comma-separated string or array)',
-    example: '1,2',
   })
   platforms: number[];
 
@@ -68,4 +61,7 @@ export class CreateGameDto extends IntersectionType(UploadCoverGameDto) {
   @Type(() => Number)
   @ApiProperty()
   companyId: number;
+
+  @ApiProperty({ type: 'string', format: 'binary' })
+  file: any;
 }

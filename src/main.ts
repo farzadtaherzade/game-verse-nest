@@ -13,7 +13,6 @@ async function bootstrap(): Promise<void> {
     .setTitle('GameVerse API')
     .setDescription('The GameVerse API description')
     .setVersion('1.0')
-    .addTag('gameverse')
     .addBearerAuth({
       type: 'http',
       scheme: 'bearer',

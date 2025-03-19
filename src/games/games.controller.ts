@@ -7,51 +7,46 @@ import {
   Param,
   Delete,
   UseGuards,
-  UseInterceptors,
   UploadedFile,
   ParseFilePipe,
   MaxFileSizeValidator,
+  Query,
+  UseInterceptors,
   HttpStatus,
 } from '@nestjs/common';
 import { GamesService } from './games.service';
 import { CreateGameDto } from './dto/create-game.dto';
 import { UpdateGameDto } from './dto/update-game.dto';
 import { JwtAuthGuard } from '../authentication/guards/jwt-auth.guard';
-import { GetUser } from '../common/decorators/user.decorator';
+import { GetUser } from '../shared/decorators/user.decorator';
 import { User } from '../entities/user.entity';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { MulterUtils } from 'src/common/utils/multer.utils';
-import {
-  ApiBearerAuth,
-  ApiBody,
-  ApiConsumes,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-
+import { MulterUtils } from 'src/shared/utils/multer.utils';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiTags } from '@nestjs/swagger';
+import { Paginate } from 'src/shared/decorators/paginate.decorator';
+import { PaginationDto } from 'src/shared/dto/pagination.dto';
+import { ApiResponse } from 'src/shared/responses/api.response';
+import { PaginatedResponse } from 'src/shared/responses/paginated.response';
+import { Game } from 'src/entities/game.entity';
 @ApiTags('games')
 @Controller('games')
 export class GamesController {
   constructor(private readonly gamesService: GamesService) {}
 
+  @Post()
+  @UseInterceptors(
+    FileInterceptor('file', {
+      storage: MulterUtils.storage('/games'),
+    }),
+  )
   @ApiBearerAuth()
-  @ApiResponse({ status: HttpStatus.CREATED, description: 'Game created' })
-  @ApiResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden' })
-  @ApiResponse({ status: HttpStatus.BAD_REQUEST, description: 'Invalid input' })
-  @ApiResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     description: 'Create a new game with file upload',
     type: CreateGameDto,
   })
   @UseGuards(JwtAuthGuard)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: MulterUtils.storage('/games'),
-    }),
-  )
-  @Post()
-  create(
+  async create(
     @Body() createGameDto: CreateGameDto,
     @GetUser() user: User,
     @UploadedFile(
@@ -60,35 +55,61 @@ export class GamesController {
       }),
     )
     file: Express.Multer.File,
-  ) {
-    return this.gamesService.create(createGameDto, user, file);
+  ): Promise<ApiResponse<Game>> {
+    const game = await this.gamesService.create(createGameDto, user, file);
+    return new ApiResponse(
+      game,
+      'Game created successfully',
+      HttpStatus.CREATED,
+    );
   }
 
   @Get()
-  findAll() {
-    return this.gamesService.findAll();
+  @Paginate()
+  async findAll(
+    @Query() paginationDto: PaginationDto,
+  ): Promise<ApiResponse<PaginatedResponse<Game>>> {
+    const { data, meta } = await this.gamesService.findAll(paginationDto);
+    const pagination = new PaginatedResponse(
+      data,
+      meta.limit,
+      meta.page,
+      meta.totalItems,
+    );
+    return new ApiResponse(
+      pagination,
+      'Games retrieved successfully',
+      HttpStatus.OK,
+    );
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.gamesService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ApiResponse<Game>> {
+    const game = await this.gamesService.findOne(+id);
+    return new ApiResponse(game, 'Game retrieved successfully', HttpStatus.OK);
   }
 
   @Patch(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  update(
+  @ApiConsumes('multipart/form-data')
+  async update(
     @Param('id') id: string,
     @Body() updateGameDto: UpdateGameDto,
     @GetUser() user: User,
-  ) {
-    return this.gamesService.update(+id, updateGameDto, user);
+  ): Promise<ApiResponse<Game>> {
+    const game = await this.gamesService.update(+id, updateGameDto, user);
+    return new ApiResponse(game, 'Game updated successfully', HttpStatus.OK);
   }
 
   @Delete(':id')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  remove(@Param('id') id: string, @GetUser() user: User) {
-    return this.gamesService.remove(+id, user);
+  async remove(
+    @Param('id') id: string,
+    @GetUser() user: User,
+  ): Promise<ApiResponse<{ message: string }>> {
+    const game = await this.gamesService.remove(+id, user);
+    return new ApiResponse(game, 'Game deleted successfully', HttpStatus.OK);
   }
 }

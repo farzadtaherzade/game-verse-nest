@@ -17,15 +17,6 @@ export class UsersService {
       where: {
         username,
       },
-      select: {
-        password: true,
-        avatar: true,
-        created_at: true,
-        email: true,
-        games: true,
-        id: true,
-        username: true,
-      },
     });
 
     return user ?? undefined;
@@ -35,15 +26,6 @@ export class UsersService {
     const user = await this.userRepository.findOne({
       where: {
         email,
-      },
-      select: {
-        password: true,
-        avatar: true,
-        created_at: true,
-        email: true,
-        games: true,
-        id: true,
-        username: true,
       },
     });
 

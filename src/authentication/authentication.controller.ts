@@ -9,13 +9,19 @@ export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('sign-in')
-  signIn(@Body() signinDto: SigninDto) {
-    return this.authenticationService.signin(signinDto);
+  async signIn(@Body() signinDto: SigninDto): Promise<
+    ApiResponse<{
+      accessToken: string;
+      refreshToken: string;
+    }>
+  > {
+    const {} = await this.authenticationService.signin(signinDto);
+    return;
   }
 
   @Post('sign-up')
-  signup(@Body() signupDto: SignupDto) {
-    return this.authenticationService.signup(signupDto);
+  async signup(@Body() signupDto: SignupDto) {
+    return await this.authenticationService.signup(signupDto);
   }
 
   @Post('refresh-token')
