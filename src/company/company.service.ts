@@ -5,6 +5,7 @@ import { User } from 'src/entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Company } from 'src/entities/company.entity';
 import { Like, Repository } from 'typeorm';
+import { PaginationDto } from 'src/shared/dto/pagination.dto';
 
 @Injectable()
 export class CompanyService {
@@ -21,26 +22,37 @@ export class CompanyService {
     return await this.companyRepository.save(company);
   }
 
-  async findAll() {
-    const [companies, count] = await this.companyRepository.findAndCount();
+  async findAll(pagination: PaginationDto) {
+    const { page = 1, limit = 10 } = pagination;
+    const [companies, count] = await this.companyRepository.findAndCount({
+      take: limit,
+      skip: limit * (page - 1),
+    });
     return {
       companies,
-      pagination: {
+      meta: {
         total: count,
         length: companies.length,
+        page,
+        limit,
       },
     };
   }
 
-  async findMyCompanies(user: User) {
+  async findMyCompanies(user: User, pageDto: PaginationDto) {
+    const { page = 1, limit = 10 } = pageDto;
     const [companies, count] = await this.companyRepository.findAndCount({
       where: { user: { id: user.id } },
+      take: limit,
+      skip: limit * (page - 1),
     });
     return {
       companies,
-      pagination: {
+      meta: {
         total: count,
         length: companies.length,
+        page,
+        limit,
       },
     };
   }
@@ -70,11 +82,23 @@ export class CompanyService {
     return await this.companyRepository.remove(company);
   }
 
-  async search(name: string) {
-    return await this.companyRepository.find({
+  async search(name: string, pageDto: PaginationDto) {
+    const { page = 1, limit = 10 } = pageDto;
+    const [companies, count] = await this.companyRepository.findAndCount({
       where: {
         name: Like(`%${name}%`),
       },
+      take: limit,
+      skip: limit * (page - 1),
     });
+    return {
+      companies,
+      meta: {
+        total: count,
+        length: companies.length,
+        page,
+        limit,
+      },
+    };
   }
 }

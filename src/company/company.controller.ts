@@ -7,6 +7,8 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
+  HttpStatus,
 } from '@nestjs/common';
 import { CompanyService } from './company.service';
 import { CreateCompanyDto } from './dto/create-company.dto';
@@ -27,6 +29,10 @@ import {
   ApiOkResponse,
 } from '@nestjs/swagger';
 import { Company } from 'src/entities/company.entity';
+import { ApiResponse } from 'src/shared/responses/api.response';
+import { PaginatedResponse } from 'src/shared/responses/paginated.response';
+import { Paginate } from 'src/shared/decorators/paginate.decorator';
+import { PaginationDto } from 'src/shared/dto/pagination.dto';
 
 @ApiTags('company')
 @Controller('company')
@@ -44,8 +50,16 @@ export class CompanyController {
   })
   @ApiBadRequestResponse({ description: 'Invalid input data.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  create(@Body() createCompanyDto: CreateCompanyDto, @GetUser() user: User) {
-    return this.companyService.create(createCompanyDto, user);
+  async create(
+    @Body() createCompanyDto: CreateCompanyDto,
+    @GetUser() user: User,
+  ): Promise<ApiResponse<Company>> {
+    const company = await this.companyService.create(createCompanyDto, user);
+    return new ApiResponse(
+      company,
+      'Company created successfully',
+      HttpStatus.CREATED,
+    );
   }
 
   @Get()
@@ -54,8 +68,23 @@ export class CompanyController {
     description: 'List of all companies.',
     type: [Company],
   })
-  findAll() {
-    return this.companyService.findAll();
+  @Paginate()
+  async findAll(
+    @Query() pagination: PaginationDto,
+  ): Promise<ApiResponse<PaginatedResponse<Company>>> {
+    const { companies, meta } = await this.companyService.findAll(pagination);
+    const response = new PaginatedResponse(
+      companies,
+      meta.limit,
+      meta.page,
+      meta.total,
+    );
+
+    return new ApiResponse(
+      response,
+      'Companies retrieved successfully',
+      HttpStatus.OK,
+    );
   }
 
   @Get(':id')
@@ -66,8 +95,13 @@ export class CompanyController {
     type: Company,
   })
   @ApiNotFoundResponse({ description: 'Company not found.' })
-  findOne(@Param('id') id: string) {
-    return this.companyService.findOne(+id);
+  async findOne(@Param('id') id: string): Promise<ApiResponse<Company>> {
+    const company = await this.companyService.findOne(+id);
+    return new ApiResponse(
+      company,
+      'Company retrieved successfully',
+      HttpStatus.OK,
+    );
   }
 
   @Patch(':id')
@@ -83,8 +117,16 @@ export class CompanyController {
   @ApiBadRequestResponse({ description: 'Invalid input data.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiNotFoundResponse({ description: 'Company not found.' })
-  update(@Param('id') id: string, @Body() updateCompanyDto: UpdateCompanyDto) {
-    return this.companyService.update(+id, updateCompanyDto);
+  async update(
+    @Param('id') id: string,
+    @Body() updateCompanyDto: UpdateCompanyDto,
+  ): Promise<ApiResponse<Company>> {
+    const company = await this.companyService.update(+id, updateCompanyDto);
+    return new ApiResponse(
+      company,
+      'Company updated successfully',
+      HttpStatus.OK,
+    );
   }
 
   @Delete(':id')
@@ -95,8 +137,13 @@ export class CompanyController {
   @ApiOkResponse({ description: 'The company has been successfully deleted.' })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
   @ApiNotFoundResponse({ description: 'Company not found.' })
-  remove(@Param('id') id: string) {
-    return this.companyService.remove(+id);
+  async remove(@Param('id') id: string): Promise<ApiResponse<Company>> {
+    const company = await this.companyService.remove(+id);
+    return new ApiResponse(
+      company,
+      'Company deleted successfully with id: ' + id,
+      HttpStatus.OK,
+    );
   }
 
   @Get('/search/:name')
@@ -106,8 +153,26 @@ export class CompanyController {
     description: 'List of companies matching the search criteria.',
     type: [Company],
   })
-  search(@Param('name') name: string) {
-    return this.companyService.search(name);
+  @Paginate()
+  async search(
+    @Param('name') name: string,
+    @Query() pagination: PaginationDto,
+  ): Promise<ApiResponse<PaginatedResponse<Company>>> {
+    const { companies, meta } = await this.companyService.search(
+      name,
+      pagination,
+    );
+    const response = new PaginatedResponse(
+      companies,
+      meta.limit,
+      meta.page,
+      meta.total,
+    );
+    return new ApiResponse(
+      response,
+      'Companies retrieved successfully',
+      HttpStatus.OK,
+    );
   }
 
   @Get('/my-companies')
@@ -119,7 +184,26 @@ export class CompanyController {
     type: [Company],
   })
   @ApiUnauthorizedResponse({ description: 'Unauthorized.' })
-  findMyCompanies(@GetUser() user: User) {
-    return this.companyService.findMyCompanies(user);
+  @Paginate()
+  async findMyCompanies(
+    @GetUser() user: User,
+    @Query() pagination: PaginationDto,
+  ): Promise<ApiResponse<PaginatedResponse<Company>>> {
+    const { companies, meta } = await this.companyService.findMyCompanies(
+      user,
+      pagination,
+    );
+    const response = new PaginatedResponse(
+      companies,
+      meta.limit,
+      meta.page,
+      meta.total,
+    );
+
+    return new ApiResponse(
+      response,
+      'Companies retrieved successfully',
+      HttpStatus.OK,
+    );
   }
 }
